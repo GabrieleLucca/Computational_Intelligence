@@ -3,13 +3,10 @@ from copy import deepcopy
 from enum import Enum
 import numpy as np
 
-# Rules on PDF and https://cdn.1j1ju.com/medias/a8/5e/26-quixo-rulebook.pdf
+# Rules on PDF
 
 
 class Move(Enum):
-    '''
-    Selects where you want to place the taken piece. The rest of the pieces are shifted
-    '''
     TOP = 0
     BOTTOM = 1
     LEFT = 2
@@ -24,9 +21,6 @@ class Player(ABC):
     @abstractmethod
     def make_move(self, game: 'Game') -> tuple[tuple[int, int], Move]:
         '''
-        The game accepts coordinates of the type (X, Y). X goes from left to right, while Y goes from top to bottom, as in 2D graphics.
-        Thus, the coordinates that this method returns shall be in the (X, Y) format.
-
         game: the Quixo game. You can use it to override the current game with yours, but everything is evaluated by the main game
         return values: this method shall return a tuple of X,Y positions and a move among TOP, BOTTOM, LEFT and RIGHT
         '''
@@ -34,90 +28,139 @@ class Player(ABC):
 
 
 class Game(object):
-    def __init__(self) -> None:
-        self._board = np.ones((5, 5), dtype=np.uint8) * -1
+    def __init__(self, board = None) -> None:
+        if board is not None:
+            self._board = board
+        else:
+            self._board = np.ones((5, 5), dtype=np.uint8) * -1
         self.current_player_idx = 1
-
-    def get_board(self) -> np.ndarray:
+        self.num_playes=0
+    
+    def get_current_player(self) -> int:
+        '''
+        Returns the current player ID
+        '''
+        return self.current_player_idx
+    
+    def get_board(self):
         '''
         Returns the board
         '''
         return deepcopy(self._board)
 
-    def get_current_player(self) -> int:
-        '''
-        Returns the current player
-        '''
-        return deepcopy(self.current_player_idx)
-
     def print(self):
         '''Prints the board. -1 are neutral pieces, 0 are pieces of player 0, 1 pieces of player 1'''
         print(self._board)
-
+        
+    def reward(self):
+        if self.check_winner()==0:
+            return 1
+        elif self.check_winner()==1:
+            return -1
+        else:
+            return 0
+        
     def check_winner(self) -> int:
         '''Check the winner. Returns the player ID of the winner if any, otherwise returns -1'''
         # for each row
-        player = self.get_current_player()
-        winner = -1
+        if self.num_playes==50:
+            return 2
+        
         for x in range(self._board.shape[0]):
             # if a player has completed an entire row
             if self._board[x, 0] != -1 and all(self._board[x, :] == self._board[x, 0]):
-                # return winner is this guy
-                winner = self._board[x, 0]
-        if winner > -1 and winner != self.get_current_player():
-            return winner
+                # return the relative id
+                return self._board[x, 0]
         # for each column
         for y in range(self._board.shape[1]):
             # if a player has completed an entire column
             if self._board[0, y] != -1 and all(self._board[:, y] == self._board[0, y]):
                 # return the relative id
-                winner = self._board[0, y]
-        if winner > -1 and winner != self.get_current_player():
-            return winner
+                return self._board[0, y]
         # if a player has completed the principal diagonal
         if self._board[0, 0] != -1 and all(
             [self._board[x, x]
                 for x in range(self._board.shape[0])] == self._board[0, 0]
         ):
             # return the relative id
-            winner = self._board[0, 0]
-        if winner > -1 and winner != self.get_current_player():
-            return winner
+            return self._board[0, 0]
         # if a player has completed the secondary diagonal
         if self._board[0, -1] != -1 and all(
             [self._board[x, -(x + 1)]
              for x in range(self._board.shape[0])] == self._board[0, -1]
         ):
             # return the relative id
-            winner = self._board[0, -1]
-        return winner
+            return self._board[0, -1]
+        return -1
 
     def play(self, player1: Player, player2: Player) -> int:
         '''Play the game. Returns the winning player'''
         players = [player1, player2]
+        self.num_playes=0
+        self.current_player_idx = 1
         winner = -1
         while winner < 0:
             self.current_player_idx += 1
             self.current_player_idx %= len(players)
             ok = False
-            while not ok:
-                from_pos, slide = players[self.current_player_idx].make_move(
-                    self)
-                ok = self.__move(from_pos, slide, self.current_player_idx)
-            winner = self.check_winner()
-        return winner
 
-    def __move(self, from_pos: tuple[int, int], slide: Move, player_id: int) -> bool:
+           
+            from_pos, slide = players[self.current_player_idx].make_move(self)
+            ok = self.move(from_pos, slide, self.current_player_idx)
+            
+            winner = self.check_winner()
+
+            
+        return winner
+    
+    def possible_moves(self, player_id: int) -> list[tuple[tuple[int, int], Move]]:
+        '''Returns a list of possible moves for the player'''
+        moves = []
+        CORNER = [(0,0), (0,4), (4,4), (4,0)]
+        STEP = [1, 1, -1, -1]
+        MOVES = [Move.TOP, Move.RIGHT, Move.BOTTOM, Move.LEFT]
+        for i in range(len(CORNER)):
+            match i:
+                case 0:
+                    if self._board[CORNER[i]] == -1 or self._board[CORNER[i]] == player_id:
+                        moves.append((CORNER[i], Move.RIGHT))
+                        moves.append((CORNER[i], Move.BOTTOM))
+                case 1:
+                    if self._board[CORNER[i]] == -1 or self._board[CORNER[i]] == player_id:
+                        moves.append((CORNER[i], Move.LEFT))
+                        moves.append((CORNER[i], Move.BOTTOM))
+                case 2:
+                    if self._board[CORNER[i]] == -1 or self._board[CORNER[i]] == player_id:
+                        moves.append((CORNER[i], Move.LEFT))
+                        moves.append((CORNER[i], Move.TOP))
+                case 3:
+                    if self._board[CORNER[i]] == -1 or self._board[CORNER[i]] == player_id:
+                        moves.append((CORNER[i], Move.RIGHT))
+                        moves.append((CORNER[i], Move.TOP))
+                
+            for x in range(CORNER[i][0], CORNER[(i+1)%4][0]+STEP[i], STEP[i]):
+                for y in range(CORNER[i][1], CORNER[(i+1)%4][1]+STEP[i], STEP[i]):
+                    if (x,y) not in CORNER and (self._board[x,y] == -1 or self._board[x,y] == player_id):
+                        for j in range(len(MOVES)):
+                            if j!= i:
+                                moves.append(((x,y), MOVES[j]))
+        return moves
+
+    def move(self, from_pos: tuple[int, int], slide: Move, player_id: int) -> bool:
         '''Perform a move'''
+
         if player_id > 2:
             return False
+        
+        self.num_playes+=1
+
         # Oh God, Numpy arrays
-        prev_value = deepcopy(self._board[(from_pos[1], from_pos[0])])
-        acceptable = self.__take((from_pos[1], from_pos[0]), player_id)
+        prev_value = deepcopy(self._board[(from_pos[0], from_pos[1])])
+        acceptable = self.__take((from_pos[0], from_pos[1]), player_id)
         if acceptable:
-            acceptable = self.__slide((from_pos[1], from_pos[0]), slide)
+            acceptable = self.__slide((from_pos[0], from_pos[1]), slide)
             if not acceptable:
-                self._board[(from_pos[1], from_pos[0])] = deepcopy(prev_value)
+                self._board[(from_pos[0], from_pos[1])] = deepcopy(prev_value)
         return acceptable
 
     def __take(self, from_pos: tuple[int, int], player_id: int) -> bool:

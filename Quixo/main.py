@@ -6,8 +6,9 @@ import numpy as np
 import struct
 
 class RandomPlayer(Player):
-    def __init__(self) -> None:
+    def __init__(self, player) -> None:
         super().__init__()
+        self.player=player
 
     def make_move(self, game: 'Game') -> tuple[tuple[int, int], Move]:
         from_pos, move=random.choice(game.possible_moves(game.get_current_player()))
@@ -19,7 +20,7 @@ class QlearningPlayer(Player):
         super().__init__()
         self.q_table= {}
         self.player=player
-        file = "Quixo\\Q_table_0.txt" if self.player==0 else "Quixo\\Q_table_1.txt"
+        file = "Quixo\\Qtable_Player0.txt" if self.player==0 else "Quixo\\Qtable_Player1.txt"
         print("Charging Q_table...")
         with open(file, 'r') as f:
             for line in f:
@@ -335,8 +336,8 @@ class MinMaxPlayerGA(Player):
 
 
 def test():
-    players_0 =  [RandomPlayer(0), QlearningPlayer(0),MinMaxPlayer(0), MinMaxPlayerGA(0)]
-    players_1 =  [RandomPlayer(1), QlearningPlayer(1),MinMaxPlayer(1), MinMaxPlayerGA(1)] 
+    players_0 =  [RandomPlayer(0), QlearningPlayer(0), MinMaxPlayer(0), MinMaxPlayerGA(0)]
+    players_1 =  [RandomPlayer(1), QlearningPlayer(1), MinMaxPlayer(1), MinMaxPlayerGA(1)] 
 
     names= ["RandomPlayer", "Qlearning","MinMax", "MinMaxGA"] 
 

@@ -47,10 +47,87 @@ class Game(object):
         Returns the board
         '''
         return deepcopy(self._board)
+    
+    def get_possible_actions(self) -> list[tuple[tuple[int, int], Move]]:
+        """
+        Returns a list of possible actions.
 
-    def print(self):
-        '''Prints the board. -1 are neutral pieces, 0 are pieces of player 0, 1 pieces of player 1'''
-        print(self._board)
+        An action is a tuple of:
+        - the position of the piece to move
+        - the direction in which to move it
+
+        An action is possible if:
+        - the piece is neutral or belongs to the current player
+        - the piece is on the edge of the board
+
+        The direction in which a piece can be moved depends on its position:
+        - all pieces can be moved from the opposite edge(s) of the board
+        - pieces not in a corner can be also moved in directions parallel to the edge they were taken from
+        """
+        # 1. Initialize the list of possible actions
+        possible_actions = []
+
+        # 2. Check the edges of the board for possible actions
+        for i in range(5):
+
+            # 2.1. Check TOP and BOTTOM edges
+            for row in [0, 4]:
+                # 2.1.1. Get the piece at the current position
+                piece = self._board[row, i]
+                # 2.1.2. If the piece is neutral or belongs to the current player
+                if piece == -1 or piece == self.current_player_idx:
+                    # 2.1.2.1. Add the option to move it from the opposite edge
+                    if row == 0: possible_actions.append(((i, row), Move.BOTTOM))
+                    else: possible_actions.append(((i, row), Move.TOP))
+                    # 2.1.2.2. If the piece is not in a corner, also add the option to move it from parallel edges
+                    if i != 0 and i != 4:
+                        possible_actions.append(((i, row), Move.LEFT))
+                        possible_actions.append(((i, row), Move.RIGHT))
+
+            # 2.2. Check LEFT and RIGHT edges
+            for col in [0, 4]:
+                # 2.2.1. Get the piece at the current position
+                piece = self._board[i, col]
+                # 2.2.2. If the piece is neutral or belongs to the current player
+                if piece == -1 or piece == self.current_player_idx:
+                    # 2.2.2.1. Add the option to move it from the opposite edge
+                    if col == 0: possible_actions.append(((col, i), Move.RIGHT))
+                    else: possible_actions.append(((col, i), Move.LEFT))
+                    # 2.2.2.2. If the piece is not in a corner, also add the option to move it from parallel edges
+                    if i != 0 and i != 4:
+                        possible_actions.append(((col, i), Move.TOP))
+                        possible_actions.append(((col, i), Move.BOTTOM))
+
+        # 3. Return the list of possible actions
+        return possible_actions
+
+    def print(self, winner: int=-1):
+        """
+        Prints the current player and the board in a more readable way
+        - ⬜ are neutral pieces
+        - ❌ are pieces of player 0
+        - 🔴 are pieces of player 1
+        """
+
+        # 1. Print the board
+        print("\n*****************")
+        for row in self._board:
+            for cell in row:
+                if cell == -1:
+                    print("⬜", end=" ")
+                elif cell == 0:
+                    print("❌", end=" ")
+                elif cell == 1:
+                    print("🔴", end=" ")
+            print()
+        print()
+
+        # 2. Print the current player or the winner
+        if winner >= 0:
+            print(f"Player {self.current_player_idx} wins the game!")
+        else:
+            symbol = "❌" if self.current_player_idx == 0 else "🔴"
+            print(f"Current player: {self.current_player_idx}. It's going to insert {symbol}")
         
     def reward(self):
         if self.check_winner()==0:
@@ -92,26 +169,31 @@ class Game(object):
             # return the relative id
             return self._board[0, -1]
         return -1
+    
+    def change_player(self):
+        """Changes the current player."""
+        self.current_player_idx = 1 - self.current_player_idx
 
-    def play(self, player1: Player, player2: Player) -> int:
-        '''Play the game. Returns the winning player'''
+    def play(self, player1: Player, player2: Player, verbose: bool=False, debug: bool=False) -> int:
         players = [player1, player2]
-        self.num_playes=0
-        self.current_player_idx = 1
         winner = -1
         while winner < 0:
-            self.current_player_idx += 1
-            self.current_player_idx %= len(players)
+            self.change_player()
+            if verbose: #stampa su console
+                self.print()
+            if debug: #verifica numero di azioni possibili
+                possible_actions = self.get_possible_actions()
+                print("Number of possible actions:", len(possible_actions))
+                print("Possible actions: ", possible_actions)
             ok = False
-
-           
-            from_pos, slide = players[self.current_player_idx].make_move(self)
-            ok = self.move(from_pos, slide, self.current_player_idx)
-            
+            while not ok:
+                from_pos, slide = players[self.current_player_idx].make_move(self)
+                ok = self.move(from_pos, slide, self.current_player_idx)
             winner = self.check_winner()
-
-            
+        if verbose:
+            self.print(winner)
         return winner
+
     
     def possible_moves(self, player_id: int) -> list[tuple[tuple[int, int], Move]]:
         '''Returns a list of possible moves for the player'''

@@ -1,7 +1,6 @@
 import numpy as np
-from itertools import permutations
 from tqdm import tqdm
-from game import Game, Move, Player
+from game import Game, Move
 from copy import deepcopy
 import random
 import sys
@@ -67,29 +66,26 @@ class Qlearning:
             self.q_table[(state, action)] = self.get_q_value(state, action) + self.alpha * (reward - self.get_q_value(state, action))
             reward = reward * self.gamma
 
-        
-
-
+ 
 if __name__ == '__main__':
     Q = Qlearning(0.5, 0.9, 1, 1)
-    games = 250000
+    games = 2500
     epsilon = np.linspace(1, 0, num=games, endpoint=True)
-
-
+    
+    #Training secondo giocatore
     for i in tqdm(range(games)):
         Q.set_epsilon(epsilon[i])
         game = Game()
         player = 0
         trajectory = []
-        
-        while game.check_winner()==-1:
+
+        while game.check_winner() == -1:
             state = game.get_board()
             actions = game.possible_moves(player)
             action = random.choice(actions)
             game.move(action[0], action[1], player)
-            
-            
-            if game.check_winner()!=-1:
+
+            if game.check_winner() != -1:
                 break
             player = 1 - player
 
@@ -100,13 +96,42 @@ if __name__ == '__main__':
             trajectory.append((state, action))
 
             player = 1 - player
-        
+
         Q.update(trajectory, Q.reward(game.check_winner()))
         trajectory = []
-    
 
-    
-    with open('Quixo\\Q_table_1.txt', 'w') as f:
-        sys.stdout = f 
+    with open('Qtable_Player1.txt', 'w') as f:
         for key, value in Q.get_q_table().items():
-            print(key[0], key[1], value)
+            print(key[0], key[1], value, file=f)
+
+    #Training primo giocatore
+    for i in tqdm(range(games)):
+        Q.set_epsilon(epsilon[i])
+        game = Game()
+        player = 1
+        trajectory = []
+
+        while game.check_winner() == -1:
+            state = game.get_board()
+            actions = game.possible_moves(player)
+            action = random.choice(actions)
+            game.move(action[0], action[1], player)
+
+            if game.check_winner() != -1:
+                break
+            player = 1 - player
+
+            state = game.get_board()
+            actions = game.possible_moves(player)
+            action = Q.choice_action(state, actions)
+            game.move(action[0], action[1], player)
+            trajectory.append((state, action))
+
+            player = 1 - player
+
+        Q.update(trajectory, Q.reward(game.check_winner()))
+        trajectory = []
+
+    with open('Qtable_Player0.txt', 'w') as f:
+        for key, value in Q.get_q_table().items():
+            print(key[0], key[1], value, file=f)

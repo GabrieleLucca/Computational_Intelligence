@@ -1,6 +1,5 @@
 import random
 from MinMaxPlayer import MinMaxPlayer
-from MontecarloPlayer import MonteCarloPlayer
 from RandomPlayer import RandomPlayer
 from QPlayer import QlearningPlayer
 from game import Game 
@@ -13,10 +12,10 @@ from tqdm import tqdm
 """
 
 def test():
-    players_0 =  [QlearningPlayer(0), MinMaxPlayer(0), MonteCarloPlayer(0)]
-    players_1 =  [QlearningPlayer(1), MinMaxPlayer(1), MonteCarloPlayer(1)]
+    players_0 =  [QlearningPlayer(0), MinMaxPlayer(0)]
+    players_1 =  [QlearningPlayer(1), MinMaxPlayer(1)]
 
-    names= ["Q-Learning", "MinMax", "Montecarlo"] 
+    names= ["Q-Learning", "MinMax"] 
 
     for player_0 in range(len(players_0)):
         for player_1 in range(len(players_1)):

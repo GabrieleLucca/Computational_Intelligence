@@ -236,7 +236,6 @@ class Game(object):
         
         self.num_playes+=1
 
-        # Oh God, Numpy arrays
         prev_value = deepcopy(self._board[(from_pos[0], from_pos[1])])
         acceptable = self.__take((from_pos[0], from_pos[1]), player_id)
         if acceptable:

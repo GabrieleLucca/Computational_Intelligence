@@ -7,10 +7,12 @@ from copy import deepcopy
 from tqdm import tqdm
 
 """
-    This file contains all the requirements that the final project requires. I have also created a Jupyter Notebook
+    This file contains all the data that the final project requires. I have created a Jupyter Notebook
     that is easier to manage, so I encourage to visit that instead.
 """
 
+
+"""
 def test():
     players_0 =  [QlearningPlayer(0), MinMaxPlayer(0)]
     players_1 =  [QlearningPlayer(1), MinMaxPlayer(1)]
@@ -67,3 +69,4 @@ def test():
         
 if __name__ == '__main__':
     test()
+"""

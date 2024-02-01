@@ -69,7 +69,7 @@ class Qlearning:
  
 if __name__ == '__main__':
     Q = Qlearning(0.5, 0.9, 1, 1)
-    games = 2500
+    games = 25000
     epsilon = np.linspace(1, 0, num=games, endpoint=True)
     
     #Training secondo giocatore

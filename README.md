@@ -16,19 +16,17 @@ Il repository è organizzato in modo da includere una cartella dedicata per ogni
 
 ## Elenco dei Progetti
 
-1. **Predizione del Mercato Azionario Utilizzando Reti Neurali**: Questo progetto utilizza reti neurali artificiali per prevedere le fluttuazioni dei prezzi delle azioni in base ai dati storici.
+1. **Ottimizzazione del Problema TSP Utilizzando Algoritmi Hill Climbing**: Questo progetto si concentra sull'ottimizzazione del Problema del Commesso Viaggiatore (TSP) utilizzando l'algoritmo Hill Climbing. L'obiettivo è trovare il percorso più breve che attraversa un insieme di città, massimizzando l'efficienza logistica e riducendo i costi di trasporto.
 
-2. **Classificazione delle Immagini Utilizzando Convolutional Neural Networks**: In questo progetto, vengono utilizzate reti neurali convoluzionali (CNN) per classificare le immagini in diverse categorie.
+2. **Generazione di un avversario per gioco Nim Utilizzando Algoritmi Evolutivi**: Questo progetto si concentra sulla generazione di una strategia avversaria per il gioco Nim utilizzando gli algoritmi evolutivi. L'obiettivo è creare un avversario virtuale in grado di giocare in modo intelligente contro un giocatore umano o un'altra intelligenza artificiale, massimizzando la sfida e l'interesse del gioco.
 
-3. **Ottimizzazione della Produzione Utilizzando Algoritmi Genetici**: Questo progetto si concentra sull'ottimizzazione dei processi di produzione utilizzando algoritmi genetici per massimizzare l'efficienza e ridurre i costi.
+3. **Ottimizzazione del Problema OneMax Utilizzando Algoritmi Genetici**: Questo progetto si concentra sull'ottimizzazione del Problema OneMax utilizzando gli algoritmi genetici. L'obiettivo è trovare la sequenza binaria più lunga e composta interamente da 1, massimizzando la funzione obiettivo e dimostrando l'efficacia degli algoritmi genetici nella risoluzione di problemi di ottimizzazione.
 
-4. **Riconoscimento del Linguaggio Naturale Utilizzando Metodi di NLP**: In questo progetto, vengono applicati metodi di elaborazione del linguaggio naturale (NLP) per riconoscere e classificare il testo in diverse categorie.
+4. **Generazione di un avversario per gioco e ottimizzazione del gioco Quixo**: Questo progetto si concentra sulla generazione di una strategia avversaria per il gioco Quixo e sull'ottimizzazione delle mosse utilizzando gli algoritmi genetici. L'obiettivo è creare un avversario virtuale in grado di giocare in modo intelligente contro un giocatore umano o un'altra intelligenza artificiale, massimizzando il divertimento e la sfida del gioco Quixo.
 
 ## Contributi
 
 I contributi a questo repository sono benvenuti. Se hai sviluppato un progetto di Computational Intelligence e desideri condividerlo, non esitare a fare una pull request aggiungendo una cartella per il tuo progetto seguendo la struttura indicata.
-
-Sii sicuro di includere una descrizione dettagliata del progetto e di fornire il codice sorgente, i dataset utilizzati e eventuali risultati ottenuti.
 
 ## Licenza
 
